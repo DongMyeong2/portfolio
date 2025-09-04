@@ -1,12 +1,12 @@
 name: Organize BaekjoonHub files
 
 permissions:
-  contents: write
+  contents: write   # 푸시 권한 필수!
 
 on:
   push:
-    branches: [ test ]
-  workflow_dispatch:
+    branches: [ main, test ]   # ← main도 포함
+  workflow_dispatch:           # 수동 실행 유지
 
 jobs:
   organize:
@@ -16,25 +16,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-
       - name: Reorganize files
         env:
           TZ: Asia/Seoul
         run: |
           python scripts/organize_baekjoonhub.py
-
       - name: Commit & push changes
+        env:
+          BRANCH: ${{ github.ref_name }}
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
             git commit -m "chore: organize by Language/Platform/YYYY-MM-DD/ProblemId_Title"
-            git push
+            git pull --rebase origin "$BRANCH" || true
+            git push origin HEAD:"$BRANCH"
           else
             echo "No changes to commit"
           fi
