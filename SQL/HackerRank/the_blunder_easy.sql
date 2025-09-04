@@ -1,0 +1,3 @@
+-- REPLACE를 사용하여 0을 제거
+SELECT ROUND(AVG(Salary)) - ROUND(AVG(REPLACE(Salary, '0', '')))
+FROM EMPLOYEES;

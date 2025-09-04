@@ -1,0 +1,6 @@
+WITH INFO as (
+    SELECT MIN(LAT_N) AS a, MIN(LONG_W) AS b, MAX(LAT_N) AS c, MAX(LONG_W) AS d
+    FROM STATION
+) 
+SELECT ROUND((ABS(c - a) + ABS(d - b)), 4)
+FROM INFO;
