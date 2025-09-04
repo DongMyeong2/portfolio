@@ -1,0 +1,37 @@
+name: Organize BaekjoonHub files
+
+on:
+  push:
+    branches: [ test ]
+  workflow_dispatch:
+
+jobs:
+  organize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Reorganize files
+        env:
+          TZ: Asia/Seoul
+        run: |
+          python scripts/organize_baekjoonhub.py
+
+      - name: Commit & push changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore: organize by Language/Platform/YYYY-MM-DD/ProblemId_Title"
+            git push
+          else
+            echo "No changes to commit"
+          fi
