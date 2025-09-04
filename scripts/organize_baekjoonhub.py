@@ -2,109 +2,159 @@
 import os, re, shutil, subprocess
 from datetime import datetime, timezone, timedelta
 
-# ===== 기본 설정 =====
-KST = timezone(timedelta(hours=9))  # Asia/Seoul
-# 날짜를 "오늘(KST)"로 찍습니다. (제출/커밋 시간으로 쓰고 싶으면 get_git_date() 사용하도록 바꾸세요)
-TODAY = datetime.now(KST).strftime("%Y-%m-%d")
+# ===== 공통 =====
+KST = timezone(timedelta(hours=9))
+LANG_BY_EXT = {".py": "Python", ".sql": "SQL"}
 
-# 최상위 언어 폴더: Python, SQL만 사용
-LANG_BY_EXT = {
-    ".py": "Python",
-    ".sql": "SQL",
-}
-
-# 플랫폼 키워드 → 표준 폴더명
 PLATFORM_ALIASES = {
-    # BOJ/SWEA/Programmers
-    "boj": "BOJ", "baekjoon": "BOJ", "백준": "BOJ",
-    "swea": "SWEA", "sw expert": "SWEA", "sw expert academy": "SWEA",
-    "programmers": "Programmers", "프로그래머스": "Programmers",
-    # SQL 플랫폼 추가
-    "leetcode": "LeetCode", "leet code": "LeetCode", "lc": "LeetCode", "리트코드": "LeetCode",
-    "hackerrank": "HackerRank", "해커랭크": "HackerRank", "hr": "HackerRank",
+    "boj":"BOJ","baekjoon":"BOJ","백준":"BOJ",
+    "swea":"SWEA","sw expert":"SWEA","sw expert academy":"SWEA",
+    "programmers":"Programmers","프로그래머스":"Programmers",
+    "leetcode":"LeetCode","leet code":"LeetCode","lc":"LeetCode","리트코드":"LeetCode",
+    "hackerrank":"HackerRank","해커랭크":"HackerRank","hr":"HackerRank",
 }
+ALLOW_PLATFORMS = {"BOJ","SWEA","Programmers","LeetCode","HackerRank"}
 
-ALLOW_PLATFORMS = {"BOJ", "Programmers", "SWEA", "LeetCode", "HackerRank"}
-DEFAULT_PLATFORM = "BOJ"  # 감지 실패 시 기본 플랫폼 (원하면 "Programmers"로 바꾸세요)
-
-IGNORE_DIRS = {".git", ".github", "scripts", ".venv", "venv", "__pycache__"}
+IGNORE_DIRS = {".git",".github","scripts",".venv","venv","__pycache__"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 def detect_language(file):
     return LANG_BY_EXT.get(os.path.splitext(file)[1].lower())
 
 def detect_platform(parts_lower):
-    # 경로/파일명 컴포넌트에서 키워드 탐지
     for p in parts_lower:
         for key, name in PLATFORM_ALIASES.items():
             if key in p:
                 return name
     return None
 
-def get_git_date(path):
-    """
-    파일의 마지막 커밋 날짜를 KST YYYY-MM-DD로 반환.
-    원하면 TODAY 대신 이 값을 써서 '제출일자≈커밋일자'로 폴더를 만들 수 있습니다.
-    """
+def git_last_commit_date_kst(path):
+    """파일의 마지막 커밋 날짜(KST, YYYY-MM-DD)"""
     try:
         iso = subprocess.check_output(
-            ["git", "log", "-1", '--format=%cI', path],
+            ["git","log","-1","--format=%cI", path],
             stderr=subprocess.DEVNULL
         ).decode().strip()
         if iso:
-            dt = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(KST)
+            dt = datetime.fromisoformat(iso.replace("Z","+00:00")).astimezone(KST)
             return dt.strftime("%Y-%m-%d")
     except Exception:
         pass
-    return TODAY
+    # 기록이 없으면 오늘
+    return datetime.now(KST).strftime("%Y-%m-%d")
 
-def extract_id_title(path, filename_stem):
+def git_last_commit_message(path):
+    try:
+        msg = subprocess.check_output(
+            ["git","log","-1","--pretty=%B", path],
+            stderr=subprocess.DEVNULL
+        ).decode().strip()
+        return msg
+    except Exception:
+        return ""
+
+def extract_id_title(path, filename_stem, parent_hint: str | None):
     """
-    파일명/상위폴더명에서 문제번호와 제목을 추출.
-    - 우선 파일명에서 '숫자 + 구분자 + 제목' 패턴을 시도: '12368_제목', '1. Two Sum', '175-Combine Two Tables' 등
-    - 실패하면 숫자 없는 제목만 사용
-    - 상위폴더가 날짜(YYYY-MM-DD)이면 힌트에서 제외
+    문제번호 & 제목 추출:
+    - 파일명 '12345_제목', '12345. 제목', '12345-제목' 우선
+    - 실패하면 부모폴더에서 같은 패턴 시도
+    - 그래도 실패하면 번호 없음
     """
-    parent = os.path.basename(os.path.dirname(path))
-    parent_for_hint = parent if not DATE_RE.match(parent) else ""
+    def parse(s):
+        m = re.match(r"^\s*(\d+)[.\s_-]+(.+)$", s)
+        if m: return m.group(1), m.group(2)
+        return None, None
 
-    # 1) 파일명에서 "앞부분 숫자 + 구분자 + 제목"
-    m = re.match(r"^\s*(\d+)[.\s_-]+(.+)$", filename_stem)
-    if m:
-        pid = m.group(1)
-        title = m.group(2)
-    else:
-        # 2) 부모 폴더명이 날짜가 아니고 "앞부분 숫자 + 구분자 + 제목"이면 활용
-        if parent_for_hint:
-            m2 = re.match(r"^\s*(\d+)[.\s_-]+(.+)$", parent_for_hint)
-        else:
-            m2 = None
-        if m2:
-            pid = m2.group(1)
-            # 제목은 파일명/부모 중 더 정보가 많은 쪽을 사용
-            title = filename_stem if len(filename_stem) > len(m2.group(2)) else m2.group(2)
-        else:
-            # 3) 그래도 실패하면 숫자 없이 제목만
-            pid = None
-            title = filename_stem
+    pid, title = parse(filename_stem)
+    if not pid and parent_hint:
+        pid, pt = parse(parent_hint)
+        if pid:
+            title = filename_stem if len(filename_stem) > len(pt) else pt
+    if not title:
+        title = filename_stem
 
-    # 제목 정리: 공백->_, 금지문자 제거
     def sanitize(s):
         s = s.strip()
         s = re.sub(r"[\\/:\*\?\"<>\|]", "", s)
         s = re.sub(r"\s+", "_", s)
         return s[:120] if s else "untitled"
 
-    title = sanitize(title)
-    return pid, title
+    return pid, sanitize(title)
 
-def already_organized(parts):
-    # <Language>/<Platform>/<YYYY-MM-DD>/filename ?
-    if len(parts) < 4: return False
-    if parts[0] not in {"Python", "SQL"}: return False
-    if parts[1] not in ALLOW_PLATFORMS: return False
-    if not DATE_RE.match(parts[2]): return False
+def already_organized_per_problem(rel_parts):
+    """
+    우리가 원하는 형태인가?
+    Python/BOJ/<문제폴더>/<파일>
+    (부모 폴더가 날짜가 아니어야 함)
+    """
+    if len(rel_parts) < 4: return False
+    if rel_parts[0] not in {"Python","SQL"}: return False
+    if rel_parts[1] not in ALLOW_PLATFORMS: return False
+    # 부모 폴더가 날짜면 "옛 구조"로 보고 재정리
+    if DATE_RE.match(rel_parts[-2]): return False
     return True
+
+def read_top_comment_block(src_path):
+    """
+    소스 파일 상단의 주석 블록을 README로 옮기기 위해 추출 (# 또는 '''...''')
+    """
+    try:
+        with open(src_path, "r", encoding="utf-8") as f:
+            text = f.read()
+    except:
+        return ""
+
+    # triple quote 우선
+    tq = re.search(r'^\s*(?:[ruRU]{0,2})("""|\'\'\')(.*?)\1', text, re.S|re.M)
+    if tq:
+        return tq.group(2).strip()
+
+    # 연속 # 블록
+    lines = []
+    for line in text.splitlines():
+        if re.match(r'^\s*#', line):
+            lines.append(re.sub(r'^\s*#\s?', '', line))
+        elif not line.strip():   # 빈 줄은 주석 블록에 포함
+            if lines: lines.append("")
+        else:
+            break
+    return "\n".join(lines).strip()
+
+def ensure_readme(dst_dir, platform, pid, title, solved_date, lang, src_path):
+    readme = os.path.join(dst_dir, "README.md")
+    if os.path.exists(readme):
+        return  # 이미 있으면 보존
+
+    meta = git_last_commit_message(src_path)
+    # BaekjoonHub 기본 커밋 메시지에서 Time/Memory 대충 파싱
+    m_time = re.search(r"Time:\s*([0-9]+)\s*ms", meta)
+    m_mem  = re.search(r"Memory:\s*([0-9]+)\s*KB", meta)
+
+    note = read_top_comment_block(src_path)
+
+    problem_url = ""
+    if platform == "BOJ" and pid:
+        problem_url = f"https://www.acmicpc.net/problem/{pid}"
+
+    contents = []
+    contents.append(f"# {pid+' ' if pid else ''}{title}")
+    contents.append("")
+    contents.append(f"- **Platform**: {platform}")
+    contents.append(f"- **Solved date**: {solved_date} (KST)")
+    contents.append(f"- **Language**: {lang}")
+    if problem_url:
+        contents.append(f"- **Link**: {problem_url}")
+    if m_time or m_mem:
+        tm = []
+        if m_time: tm.append(f"{m_time.group(1)} ms")
+        if m_mem:  tm.append(f"{m_mem.group(1)} KB")
+        contents.append(f"- **Perf**: {', '.join(tm)}")
+    contents.append("")
+    contents.append("## Notes")
+    contents.append(note if note else "_(no notes)_")
+    contents.append("")
+    with open(readme, "w", encoding="utf-8") as f:
+        f.write("\n".join(contents))
 
 def main():
     repo_root = os.getcwd()
@@ -117,41 +167,43 @@ def main():
 
         for f in files:
             src = os.path.join(root, f)
+            ext = os.path.splitext(f)[1].lower()
 
-            lang = detect_language(f)    # Python/SQL만 대상
+            lang = detect_language(f)
             if not lang:
                 continue
 
-            # 이미 정리된 파일은 스킵
-            rel = os.path.relpath(src, repo_root)
-            rel_parts = rel.split(os.sep)
-            if already_organized(rel_parts):
-                continue
+            rel_parts = os.path.relpath(src, repo_root).split(os.sep)
+            if already_organized_per_problem(rel_parts):
+                continue  # 이미 우리가 원하는 형태
 
             # 플랫폼 추정
-            platform = detect_platform([p.lower() for p in parts] + [f.lower()]) or DEFAULT_PLATFORM
+            platform = detect_platform([p.lower() for p in parts] + [f.lower()]) or "BOJ"
 
-            # 파일명에서 문제번호/제목 파싱
-            stem, ext = os.path.splitext(f)
-            pid, title = extract_id_title(src, stem)
-            new_name = f"{pid}_{title}{ext}" if pid else f"{title}{ext}"
+            # 문제번호/제목
+            parent_hint = parts[-1] if parts else None
+            pid, title = extract_id_title(src, os.path.splitext(f)[0], parent_hint)
 
-            # 날짜(폴더명) 결정: TODAY 사용 (제출/커밋일 쓰려면 아래 줄로 교체)
-            date_folder = TODAY
-            # date_folder = get_git_date(src)  # 마지막 커밋 일자로 사용하고 싶을 때
+            # 제출일(커밋일자) 보존
+            solved_date = git_last_commit_date_kst(src)
 
-            dst = os.path.join(repo_root, lang, platform, date_folder, new_name)
+            # 대상 경로: Python/<Platform>/<문제번호_제목>/
+            folder_name = f"{pid}_{title}" if pid else title
+            dst_dir = os.path.join(repo_root, lang, platform, folder_name)
+            os.makedirs(dst_dir, exist_ok=True)
 
-            # 파일명 충돌 방지
+            # 파일명 충돌 방지: 동일 이름이 있으면 __1, __2 …
+            dst = os.path.join(dst_dir, f)
             base, ext2 = os.path.splitext(dst)
             k = 1
             while os.path.exists(dst):
                 dst = f"{base}__{k}{ext2}"
                 k += 1
 
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
             shutil.move(src, dst)
-            moves.append((rel, os.path.relpath(dst, repo_root)))
+            ensure_readme(dst_dir, platform, pid, title, solved_date, lang, dst)
+
+            moves.append((os.path.relpath(src, repo_root), os.path.relpath(dst, repo_root)))
 
     if moves:
         print("Moved files:")
