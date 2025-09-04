@@ -1,5 +1,8 @@
 name: Organize BaekjoonHub files
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ test ]
