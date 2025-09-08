@@ -16,6 +16,9 @@ LANG_BY_EXT = {
     ".sql": "SQL",
 }
 
+# 정리 대상이 되는 최상위 폴더만 허용 (루트에서 이 폴더들만 순회)
+ALLOW_TOP_LANG_DIRS = {"Python", "SQL"}
+
 # 플랫폼 키워드 → 표준 폴더명
 PLATFORM_ALIASES = {
     "boj": "BOJ", "baekjoon": "BOJ", "백준": "BOJ",
@@ -210,19 +213,29 @@ def main():
     moves: list[tuple[str, str]] = []
 
     for root, dirs, files in os.walk(repo_root):
-        # 무시 디렉토리 제외
-        dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
-
         rel_root = os.path.relpath(root, repo_root)
+
+        # 루트에서는 ALLOW_TOP_LANG_DIRS 만 내려가도록 제한
+        if rel_root == ".":
+            dirs[:] = [d for d in dirs if d in ALLOW_TOP_LANG_DIRS]
+        else:
+            # 그 외 위치에서는 무시 디렉토리 제외
+            dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
+
         parts = [] if rel_root == "." else rel_root.split(os.sep)
 
         for f in files:
             src = os.path.join(root, f)
+
+            # 파일 단위 가드: 루트 기준 첫 컴포넌트가 Python/ 또는 SQL/인 파일만 대상
+            rel_parts = os.path.relpath(src, repo_root).split(os.sep)
+            if len(rel_parts) < 2 or rel_parts[0] not in ALLOW_TOP_LANG_DIRS:
+                continue
+
             lang = detect_language(f)
             if not lang:
                 continue  # Python/SQL 이외 스킵
 
-            rel_parts = os.path.relpath(src, repo_root).split(os.sep)
             if already_organized_per_problem(rel_parts):
                 continue  # 이미 새 구조
 
