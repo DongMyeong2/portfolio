@@ -268,53 +268,29 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 w-full">
           <div class="flex items-end justify-between gap-4">
             <h2 data-anim style="--d:0ms" class="text-3xl font-bold">프로젝트</h2>
-            <p class="text-sm text-neutral-500">좌우 버튼으로 넘겨보세요</p>
+            <p class="text-sm text-neutral-500">이전/다음 버튼으로 페이지를 넘겨보세요</p>
           </div>
 
-          <!-- 가로 슬라이더 -->
-          <div id="pSlider" class="relative mt-6">
-            <div class="overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 backdrop-blur">
-              <div id="pTrack" class="flex transition-transform duration-500 ease-out">
-                <!-- Slide 1: 표지 이미지 -->
-                <article class="slide w-full shrink-0 p-0">
-                  <img src="assets/project1-cover.png" alt="채용 플랫폼 진단 및 지원 활성화 전략 도출" class="w-full h-[72vh] object-cover rounded-2xl">
-                </article>
-
-                <!-- Slide 2: PDF 뷰어 -->
-                <article class="slide w-full shrink-0 p-6">
-                  <div id="pdfWrap" class="h-[72vh] rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 flex flex-col">
-                    <!-- 상단 툴바 -->
-                    <div class="flex items-center justify-between p-3 text-sm">
-                      <div class="flex items-center gap-2">
-                        <button id="pdfPrev" class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80">이전</button>
-                        <button id="pdfNext" class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80">다음</button>
-                      </div>
-                      <div class="text-xs text-neutral-600 dark:text-neutral-300">
-                        Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">–</span>
-                      </div>
-                    </div>
-                    <!-- 캔버스 영역 -->
-                    <div class="flex-1 grid place-items-center overflow-auto p-2">
-                      <canvas id="pdfCanvas" class="max-h-full"></canvas>
-                    </div>
-                  </div>
-                </article>
-
+          <!-- PDF 뷰어 -->
+          <div id="pdfWrap" class="mt-6 h-[72vh] rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 flex flex-col backdrop-blur">
+            <!-- 툴바 -->
+            <div class="flex items-center justify-between p-3 text-sm">
+              <div class="flex items-center gap-2">
+                <button type="button" id="pdfPrev" class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80">이전</button>
+                <button type="button" id="pdfNext" class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80">다음</button>
+              </div>
+              <div class="text-xs text-neutral-600 dark:text-neutral-300">
+                Page <span id="pdfPageNum">1</span> / <span id="pdfPageCount">–</span>
               </div>
             </div>
-
-            <!-- 좌/우 버튼 -->
-            <button id="pPrev" class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 backdrop-blur px-3 py-2 text-sm">◀</button>
-            <button id="pNext" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 backdrop-blur px-3 py-2 text-sm">▶</button>
-
-            <!-- 인디케이터 -->
-            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2">
-              <span class="pDot w-2 h-2 rounded-full bg-brand-accent/80"></span>
-              <span class="pDot w-2 h-2 rounded-full bg-neutral-400/60"></span>
+            <!-- 캔버스 -->
+            <div class="flex-1 grid place-items-center overflow-auto p-2">
+              <canvas id="pdfCanvas" class="max-h-full"></canvas>
             </div>
           </div>
         </div>
       </section>
+
 
 
 
@@ -342,9 +318,6 @@
     </main>
 
     <!-- 유틸 스크립트 -->
-    <!-- Chart.js CDN (그래프용) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
       // ===== Intro (이름 한 글자씩 + 자동 닫힘) =====
       window.addEventListener('DOMContentLoaded', () => {
@@ -425,23 +398,6 @@
       }, { root: snap, threshold: [0.6] });
       sections.forEach(s => io.observe(s));
 
-      // ===== 프로젝트 가로 슬라이드 =====
-      const track = document.getElementById('pTrack');
-      const slides = track ? [...track.querySelectorAll('.slide')] : [];
-      const pPrev = document.getElementById('pPrev');
-      const pNext = document.getElementById('pNext');
-      const pDots = document.querySelectorAll('.pDot');
-      let pIndex = 0;
-
-      function updateSlider(){
-        const x = -(pIndex * 100);
-        track.style.transform = `translateX(${x}%)`;
-        pDots.forEach((d,i) => d.style.background = i===pIndex ? 'rgba(14,165,233,.9)' : 'rgba(156,163,175,.6)');
-        if (pIndex === 1) ensureChart(); // 두번째 슬라이드에서 차트 생성
-      }
-      pPrev?.addEventListener('click', () => { pIndex = Math.max(0, pIndex-1); updateSlider(); });
-      pNext?.addEventListener('click', () => { pIndex = Math.min(slides.length-1, pIndex+1); updateSlider(); });
-
       // 드래그/스와이프(모바일)
       let startX = null;
       track?.addEventListener('pointerdown', e => { startX = e.clientX; track.setPointerCapture(e.pointerId); });
@@ -452,58 +408,6 @@
         if(dx >  40) pPrev.click();
         startX = null;
       });
-
-      // ===== 차트 생성 (CSV가 있으면 로드) =====
-      let chartBuilt = false;
-      async function ensureChart(){
-        if(chartBuilt) return;
-
-        let labels = [], values = [];
-        try {
-          const res = await fetch('assets/project1.csv', { cache: 'no-store' });
-          if (res.ok) {
-            const text = await res.text();
-            text.trim().split(/\r?\n/).slice(1).forEach(line => {
-              const [label, value] = line.split(',');
-              labels.push(label);
-              values.push(+value);
-            });
-          }
-        } catch(e){ /* CSV 없으면 아래 더미 사용 */ }
-
-        if(labels.length === 0){
-          labels = ['신규 가입자', '활성 사용자', '공고 지원자', '평균 체류 시간'];
-          values = [72, 65, 38, 41];
-        }
-
-        const ctx = document.getElementById('p1Chart').getContext('2d');
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [{
-              label: '지표 변화(%)',
-              data: values,
-              borderRadius: 10,
-              backgroundColor: 'rgba(14,165,233,.75)'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: { grid: { display: false } },
-              y: { beginAtZero: true, ticks: { callback: v => v + '%' } }
-            },
-            animation: {
-              duration: 900,
-              easing: 'easeOutCubic'
-            },
-            plugins: { legend: { display: false } }
-          }
-        });
-        chartBuilt = true;
-      }
 
       // 초기 해시 위치로 스크롤
       const initialHash = location.hash.replace('#','');
@@ -523,61 +427,54 @@
     <!-- pdf.js (CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
-      // pdf.js 워커 설정
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-      // ===== 단일 PDF 뷰어 =====
       (function initPDFViewer(){
-        const URL = 'assets/project1.pdf'; // <- 파일 경로
-        const canvas = document.getElementById('pdfCanvas');
-        const wrap   = document.getElementById('pdfWrap');
-        const prev   = document.getElementById('pdfPrev');
-        const next   = document.getElementById('pdfNext');
-        const numEl  = document.getElementById('pdfPageNum');
-        const cntEl  = document.getElementById('pdfPageCount');
-        if(!canvas || !wrap) return; // 해당 슬라이드가 없을 때 안전 가드
+        const URL   = 'assets/project1.pdf';
+        const wrap  = document.getElementById('pdfWrap');
+        const cv    = document.getElementById('pdfCanvas');
+        const prev  = document.getElementById('pdfPrev');
+        const next  = document.getElementById('pdfNext');
+        const numEl = document.getElementById('pdfPageNum');
+        const cntEl = document.getElementById('pdfPageCount');
+        if (!wrap || !cv) return;
 
-        const ctx = canvas.getContext('2d', { alpha:false });
-        let pdfDoc = null, pageNum = 1, pageRendering = false, pendingPage = null, scale = 1;
+        const ctx = cv.getContext('2d', { alpha:false });
+        let pdfDoc = null, pageNum = 1, rendering = false, pending = null;
 
-        function viewportFor(page, baseScale=1){
+        function viewportFor(page){
           const v1 = page.getViewport({ scale: 1 });
           const targetW = (wrap.querySelector('.flex-1')?.clientWidth || v1.width) - 16;
-          const s = Math.min(2.5, targetW / v1.width) * baseScale;
-          return page.getViewport({ scale: s });
+          const scale = Math.min(2.5, targetW / v1.width);
+          return page.getViewport({ scale });
         }
 
-        function renderPage(num){
-          pageRendering = true;
-          pdfDoc.getPage(num).then(page => {
-            const viewport = viewportFor(page);
-            canvas.height = viewport.height;
-            canvas.width  = viewport.width;
-            scale = viewport.scale;
-
-            page.render({ canvasContext: ctx, viewport }).promise.then(() => {
-              pageRendering = false;
-              numEl.textContent = num;
-              if (pendingPage !== null) { renderPage(pendingPage); pendingPage = null; }
+        function renderPage(n){
+          rendering = true;
+          pdfDoc.getPage(n).then(page => {
+            const vp = viewportFor(page);
+            cv.width = vp.width; cv.height = vp.height;
+            page.render({ canvasContext: ctx, viewport: vp }).promise.then(() => {
+              rendering = false;
+              numEl.textContent = n;
+              if (pending !== null){ const p = pending; pending = null; renderPage(p); }
             });
           });
         }
+        function queue(n){ rendering ? (pending = n) : renderPage(n); }
 
-        function queueRender(num){
-          if(pageRendering) pendingPage = num;
-          else renderPage(num);
-        }
-
-        prev?.addEventListener('click', () => {
-          if(pageNum <= 1) return;
-          pageNum--; queueRender(pageNum);
+        prev?.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          if (!pdfDoc) return;
+          if (pageNum > 1){ pageNum--; queue(pageNum); }
         });
-        next?.addEventListener('click', () => {
-          if(pageNum >= (pdfDoc?.numPages || 1)) return;
-          pageNum++; queueRender(pageNum);
+        next?.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          if (!pdfDoc) return;
+          if (pageNum < pdfDoc.numPages){ pageNum++; queue(pageNum); }
         });
-        window.addEventListener('resize', () => queueRender(pageNum));
+        window.addEventListener('resize', () => queue(pageNum));
 
         pdfjsLib.getDocument(URL).promise.then(pdf => {
           pdfDoc = pdf;
@@ -589,5 +486,6 @@
         });
       })();
     </script>
+
   </body>
 </html>
