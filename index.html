@@ -40,6 +40,25 @@
     </script>
 
     <style>
+
+      @font-face{
+        font-family:'Shilla';
+        src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/Shilla_CultureM-Medium.woff2') format('woff2');
+        font-weight:500;
+        font-display:swap;
+      }
+      @font-face{
+        font-family:'Shilla';
+        src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/Shilla_CultureB-Bold.woff2') format('woff2');
+        font-weight:700;
+        font-display:swap;
+      }
+
+      /* 이 h1 전용 */
+      .font-shilla{
+        font-family:'Shilla','Noto Sans KR',ui-sans-serif,system-ui;
+      }
+
       
       :root {
         --clouds-url: url('https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=2000&q=80'); /* 필요 시 assets/clouds.jpg 로 교체 */
@@ -185,9 +204,8 @@
           <nav class="hidden md:flex items-center gap-6 text-sm">
             <a class="nav-link hover:text-brand-accent" data-target="firstPage" href="#firstPage">홈</a>
             <a class="nav-link hover:text-brand-accent" data-target="aboutPage" href="#aboutPage">소개</a>
-            <a class="nav-link hover:text-brand-accent" data-target="skillsPage" href="#skillsPage">스킬</a>
-            <a class="nav-link hover:text-brand-accent" data-target="projectsPage" href="#projectsPage">프로젝트</a>
-            <a class="nav-link hover:text-brand-accent" data-target="contactPage" href="#contactPage">연락</a>
+            <a class="nav-link hover:text-brand-accent" data-target="projectsPage" href="#projectsPage">Project 1</a>
+            <a class="nav-link hover:text-brand-accent" data-target="project2Page" href="#project2Page">Project 2</a>
           </nav>
           <div></div>
         </div>
@@ -198,9 +216,8 @@
     <div id="dotNav" class="fixed right-4 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-3 z-40">
       <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="firstPage" aria-label="홈"></button>
       <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="aboutPage" aria-label="소개"></button>
-      <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="skillsPage" aria-label="스킬"></button>
-      <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="projectsPage" aria-label="프로젝트"></button>
-      <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="contactPage" aria-label="연락"></button>
+      <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="projectsPage" aria-label="Project1"></button>
+      <button class="dot w-2.5 h-2.5 rounded-full bg-neutral-300/70 dark:bg-neutral-700/70 hover:scale-125 transition" data-target="project2Page" aria-label="Project2"></button>
     </div>
 
 
@@ -210,32 +227,99 @@
       <!-- 1. Hero -->
       <section id="firstPage" class="section h-screen snap-start flex items-center pt-20">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 items-center">
+          <!-- 왼쪽: 소개 + Contact + Skills -->
           <div>
-            <h1 data-anim style="--d:0ms" class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
-              집요하게 파고드는 분석가,<br class="hidden sm:block"/> 김동명입니다.
+            <h1 data-anim style="--d:0ms"
+                class="font-shilla text-4xl md:text-5xl font-bold leading-tight tracking-tight">
+              데이터를 집요하게 파고드는<br class="hidden sm:block"/> 분석가, 김동명입니다.
             </h1>
-            <p data-anim style="--d:120ms" class="mt-5 text-neutral-600 dark:text-neutral-300">
-              AARRR·코호트·퍼널 지표 설계, GA4 수집, ETL/자동화, 예측 모델링까지 전 과정을 경험했습니다.
-            </p>
-            <div data-anim style="--d:200ms" class="mt-6 flex flex-wrap items-center gap-3">
-              <a data-target="projectsPage" href="#projectsPage" class="jump rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-black px-4 py-2 text-sm shadow-soft">대표 프로젝트</a>
-              <a href="mailto:contact@example.com" class="rounded-xl border border-neutral-300 dark:border-neutral-700 px-4 py-2 text-sm">메일 보내기</a>
+
+
+            <!-- Contact -->
+            <div data-anim style="--d:160ms"
+                class="mt-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 p-4 backdrop-blur">
+              <h3 class="font-semibold mb-3">Contact</h3>
+              <ul class="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
+                <li class="flex items-center gap-2">
+                  <!-- mail icon -->
+                  <svg class="w-4 h-4 text-neutral-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/>
+                  </svg>
+                  <a href="mailto:ehdaud1591@naver.com" class="hover:underline">ehdaud1591@naver.com</a>
+                </li>
+                <li class="flex items-center gap-2">
+                  <!-- phone icon -->
+                  <svg class="w-4 h-4 text-neutral-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M6.6 10.8a15.6 15.6 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1.1-.23 12.7 12.7 0 0 0 4 .64 1 1 0 0 1 1 1v3.3a1 1 0 0 1-1 1A18.6 18.6 0 0 1 3 5a1 1 0 0 1 1-1h3.3a1 1 0 0 1 1 1 12.7 12.7 0 0 0 .64 4 1 1 0 0 1-.23 1.1L6.6 10.8Z"/>
+                  </svg>
+                  <a href="tel:+821028422935" class="hover:underline">010-2842-2935</a>
+                </li>
+              </ul>
             </div>
-            <div data-anim style="--d:260ms" class="mt-6 flex flex-wrap gap-2 text-xs">
-              <span class="px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900">Python</span>
-              <span class="px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900">SQL / BigQuery</span>
-              <span class="px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900">Pandas / scikit-learn</span>
-              <span class="px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900">Airflow</span>
-              <span class="px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900">Tableau</span>
-              <span class="px-2 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900">GA4 / GTM</span>
+
+            <!-- Skills -->
+            <div data-anim style="--d:240ms"
+                class="mt-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 p-4 backdrop-blur">
+              <h3 class="font-semibold mb-3">Skills</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-neutral-700 dark:text-neutral-300">
+                <ul class="list-disc list-inside space-y-1">
+                  <li><strong>데이터 분석:</strong> Python, SQL</li>
+                  <li><strong>워크플로 자동화:</strong> Airflow</li>
+                  <li class="whitespace-nowrap">
+                    <strong>데이터 트래킹:</strong> GA4, GTM, JavaScript
+                  </li>
+                </ul>
+                <ul class="list-disc list-inside space-y-1">
+                  <li><strong>시각화:</strong> Tableau</li>
+                  <li><strong>버전 관리 및 협업:</strong> Git, GitHub</li>
+                </ul>
+              </div>
             </div>
           </div>
+
+          <!-- 오른쪽: 기존 카드(원하면 유지/수정) -->
           <div class="relative">
-            <div data-anim style="--d:160ms" class="aspect-[4/3] w-full rounded-2xl bg-gradient-to-br from-sky-100 via-blue-100 to-indigo-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 shadow-soft flex items-center justify-center">
-              <div class="text-center p-6">
-                <p class="text-sm text-neutral-600 dark:text-neutral-300">대표 작업</p>
-                <h3 class="mt-1 text-xl font-semibold">익명 투표 앱 유저 분석 & 결제 예측 자동화</h3>
-                <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">AARRR·코호트·세션화 → ML 예측 → Airflow 파이프라인 → 대시보드</p>
+            <div data-anim style="--d:200ms"
+                class="aspect-[4/3] w-full rounded-2xl bg-gradient-to-br from-sky-100 via-blue-100 to-indigo-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 shadow-soft flex items-center justify-center">
+              <div class="text-left p-6 space-y-6">
+                <!-- Project 1 -->
+                <div>
+                  <h3 class="text-xl font-semibold">Project 1: 채용 플랫폼 진단 및 지원 활성화 전략 도출</h3>
+                  <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
+                    <span class="font-medium"><strong>설명:</strong></span> AARRR 기반으로 지원 지표를 분석하고, 이탈 원인을 진단해 공고 매칭·공급 전략 제안
+                  </p>
+                  <ul class="mt-3 text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
+                    <li><span class="font-medium"><strong>프로젝트 기간:</strong></span> 2025.04.07 ~ 2025.04.29</li>
+                    <li>
+                      <span class="font-medium"><strong>사용 기술:</strong></span>
+                      Python(numpy, pandas, matplotlib, seaborn, scikit-learn, hyperopt, xgboost, lightgbm), Tableau
+                    </li>
+                  </ul>
+                  <a href="#projectsPage"
+                    class="inline-flex mt-3 items-center gap-1 text-sm px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 hover:bg-white dark:hover:bg-neutral-900 transition">
+                    자세히 보기
+                    <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+
+                <hr class="border-neutral-200 dark:border-neutral-800">
+
+                <!-- Project 2 -->
+                <div>
+                  <h3 class="text-xl font-semibold">Project 2: 공휴일 전환율을 활용한 배달앱 성장 전략 도출</h3>
+                  <p class="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
+                    <span class="font-medium"><strong>설명:</strong></span> 배달앱 사용자 현황을 진단하고 공휴일 결제 전환 상승을 기회로 삼아 퍼널 분석을 통해 주요 이탈 구간을 파악하고 개선 전략 제안
+                  </p>
+                  <ul class="mt-3 text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
+                    <li><span class="font-medium"><strong>프로젝트 기간:</strong></span> 2025.07.01 ~ 2025.07.16</li>
+                    <li><span class="font-medium"><strong>사용 기술:</strong></span> SQL(BigQuery)</li>
+                  </ul>
+                  <a href="#project2Page"
+                    class="inline-flex mt-3 items-center gap-1 text-sm px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 hover:bg-white dark:hover:bg-neutral-900 transition">
+                    자세히 보기
+                    <span aria-hidden="true">→</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -246,31 +330,42 @@
       <section id="aboutPage" class="section h-screen snap-start flex items-center pt-20 border-t border-neutral-200 dark:border-neutral-800">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
           <h2 data-anim style="--d:0ms" class="text-3xl font-bold">소개</h2>
-          <p data-anim style="--d:120ms" class="mt-6 text-neutral-700 dark:text-neutral-300 leading-7">
-            서비스/프로덕트 분석가, 마케팅 분석가, 기획 분석가 포지션에 관심이 있습니다. 지표 설계-수집-분석-실행으로 이어지는 흐름을 좋아하고,
-            분석 결과를 슬라이드/블로그/대시보드로 전달해 팀이 바로 실행할 수 있게 만드는 데 집중합니다.
-          </p>
-        </div>
-      </section>
+            <div data-anim style="--d:120ms"
+          class="mt-6 text-neutral-700 dark:text-neutral-300 leading-7 space-y-4">
+              <p><strong>저는 끈질기게 물고 늘어지는 분석가</strong>입니다.</p>
 
-      <!-- 3. 스킬 -->
-      <section id="skillsPage" class="section h-screen snap-start flex items-center pt-20">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-          <h2 data-anim style="--d:0ms" class="text-3xl font-bold">스킬</h2>
-          <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div data-anim style="--d:80ms" class="p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 backdrop-blur">
-              <h3 class="font-semibold">분석 & 모델링</h3>
-              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">EDA, 가설검정, 세션화, AARRR/코호트/퍼널, 피처엔지니어링, 분류/회귀, 모델 평가/해석</p>
+              <p>
+                수학 전공을 통해 복잡한 현상을 구조화하고 정량적으로 해석하는 능력을 길렀고,
+                컴퓨터공학을 통해서는 알고리즘적 사고와 데이터베이스 이해를 쌓아
+                효율적으로 코드를 작성하고 데이터를 다루는 역량을 갖추었습니다.
+                이러한 기반은 데이터를 단순히 처리하는 데 그치지 않고,
+                문제를 빠르고 정확하게 정의하고 해결 방안을 도출하는 데 큰 도움이 되었습니다.
+              </p>
+
+              <p>
+                실제 분석 과정에서는 문제가 주어지면 관련 정보를 빠짐없이 수집해 체계적으로 구조화하고,
+                데이터의 정합성을 확보하기 위해 스키마·키·결측·중복을 세심하게 점검합니다.
+                이렇게 정리된 데이터를 바탕으로 문제의 전체 맥락을 정확히 파악하고,
+                그 안에서 <strong>집중적으로 분석할 지점</strong>을 선별해 깊이 있게 탐구합니다.
+                방대한 정보를 다루면서도 분석의 초점이 흐려지지 않도록
+                목표한 부분에만 집중하는 것을 제 분석 가치관으로 삼고 있습니다.
+              </p>
+
+              <p>
+                다양한 주제의 프로젝트를 통해 <strong>전처리의 중요성과 노하우</strong>를 쌓았으며,
+                분석가는 자신만의 이해에 머무르지 않고 결과를 타인에게
+                <strong>명확히 전달</strong>하는 것이 더 중요하다고 생각합니다.
+                이를 위해 Tableau 등 시각화 도구로 결과를 직관적으로 보여 주고,
+                사용자 행동 분석을 위해 로그 데이터를 다뤄 본 경험과
+                Google Analytics 기반의 <strong>GA4 태깅·설정</strong> 역량을 갖추고 있습니다.
+              </p>
+
+              <p>
+                저는 새로운 것을 끊임없이 탐구하는 자세로 의미 있는 결론을 도출하며,
+                탄탄한 기본기를 바탕으로 <strong>데이터 수집 → 가공 → 시각화</strong>까지
+                파이프라인 전 단계를 주도할 수 있는 분석가입니다.
+              </p>
             </div>
-            <div data-anim style="--d:140ms" class="p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 backdrop-blur">
-              <h3 class="font-semibold">데이터 엔지니어링</h3>
-              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">SQL(BigQuery/MySQL), ETL, 스케줄링(Airflow), 데이터 품질 관리, 로그 스키마 설계(GA4/GTM)</p>
-            </div>
-            <div data-anim style="--d:200ms" class="p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 backdrop-blur">
-              <h3 class="font-semibold">시각화 & 전달</h3>
-              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">Tableau, Python Matplotlib, 대시보드/리포트 제작, 스토리텔링, 프레젠테이션</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -302,29 +397,32 @@
         </div>
       </section>
 
-
-
-
-      <!-- 6. 연락 -->
-      <section id="contactPage" class="section h-screen snap-start flex items-center pt-20 border-t border-neutral-200 dark:border-neutral-800">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 data-anim style="--d:0ms" class="text-3xl font-bold">연락하기</h2>
-          <p data-anim style="--d:100ms" class="mt-4 text-neutral-700 dark:text-neutral-300">협업/채용/프로젝트 문의 환영합니다.</p>
-          <div data-anim style="--d:180ms" class="mt-6 flex items-center justify-center gap-3">
-            <a id="emailLink" href="mailto:contact@example.com" class="rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-black px-4 py-2 text-sm shadow-soft">contact@example.com</a>
-            <button id="copyEmail" class="rounded-xl border border-neutral-300 dark:border-neutral-700 px-4 py-2 text-sm">이메일 복사</button>
+      <!-- 5. 프로젝트 2 -->
+      <section id="project2Page" class="section h-screen snap-start flex items-center pt-20 border-t border-neutral-200 dark:border-neutral-800">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 w-full">
+          <div class="flex items-end justify-between gap-4">
+            <h2 class="text-3xl font-bold">Project 2: 공휴일 전환율을 활용한 배달앱 성장 전략 도출</h2>
+            <p class="text-sm text-neutral-500">이전/다음 버튼으로 페이지를 넘겨보세요</p>
           </div>
-          <div data-anim style="--d:240ms" class="mt-6 flex items-center justify-center gap-4 text-sm">
-            <a class="underline" href="https://github.com/your-username" target="_blank" rel="noreferrer">GitHub</a>
-            <a class="underline" href="https://velog.io/@your-handle" target="_blank" rel="noreferrer">Velog</a>
-            <a class="underline" href="https://your-blog.tistory.com" target="_blank" rel="noreferrer">Tistory</a>
-            <a class="underline" href="#">LinkedIn</a>
+
+          <!-- PDF 뷰어 2 -->
+          <div id="pdfWrap2" class="mt-6 h-[72vh] rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/50 flex flex-col backdrop-blur">
+            <div class="flex items-center justify-between p-3 text-sm">
+              <div class="flex items-center gap-2">
+                <button type="button" id="pdfPrev2" class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80">이전</button>
+                <button type="button" id="pdfNext2" class="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80">다음</button>
+              </div>
+              <div class="text-xs text-neutral-600 dark:text-neutral-300">
+                Page <span id="pdfPageNum2">1</span> / <span id="pdfPageCount2">–</span>
+              </div>
+            </div>
+            <div class="flex-1 grid place-items-center overflow-auto p-2">
+              <canvas id="pdfCanvas2" class="max-h-full"></canvas>
+            </div>
           </div>
-          <footer class="mt-10 text-sm text-neutral-600 dark:text-neutral-400">
-            <p>© <span id="year"></span> 김동명</p>
-          </footer>
         </div>
       </section>
+
 
     </main>
 
@@ -496,7 +594,50 @@
           console.error('PDF 로드 실패:', err);
         });
       })();
-    </script>
 
+      /* ===== Project 2 PDF ===== */
+      (function initPDFViewer2(){
+        const URL   = 'assets/project2.pdf';
+        const wrap  = document.getElementById('pdfWrap2');
+        const cv    = document.getElementById('pdfCanvas2');
+        const prev  = document.getElementById('pdfPrev2');
+        const next  = document.getElementById('pdfNext2');
+        const numEl = document.getElementById('pdfPageNum2');
+        const cntEl = document.getElementById('pdfPageCount2');
+        if (!wrap || !cv) return;
+
+        const ctx = cv.getContext('2d', { alpha:false });
+        let pdfDoc = null, pageNum = 1, rendering = false, pending = null;
+
+        function viewportFor(page){
+          const v1 = page.getViewport({ scale: 1 });
+          const targetW = (wrap.querySelector('.flex-1')?.clientWidth || v1.width) - 16;
+          const scale = Math.min(2.5, targetW / v1.width);
+          return page.getViewport({ scale });
+        }
+        function renderPage(n){
+          rendering = true;
+          pdfDoc.getPage(n).then(page => {
+            const vp = viewportFor(page);
+            cv.width = vp.width; cv.height = vp.height;
+            page.render({ canvasContext: ctx, viewport: vp }).promise.then(() => {
+              rendering = false;
+              numEl.textContent = n;
+              if (pending !== null){ const p = pending; pending = null; renderPage(p); }
+            });
+          });
+        }
+        function queue(n){ rendering ? (pending = n) : renderPage(n); }
+
+        prev?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); if (pdfDoc && pageNum > 1) { pageNum--; queue(pageNum); } });
+        next?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); if (pdfDoc && pageNum < pdfDoc.numPages) { pageNum++; queue(pageNum); } });
+        window.addEventListener('resize', () => queue(pageNum));
+
+        pdfjsLib.getDocument(URL).promise.then(pdf => {
+          pdfDoc = pdf; cntEl.textContent = pdf.numPages; renderPage(pageNum);
+        }).catch(err => { cntEl.textContent = 'ERR'; console.error('PDF2 로드 실패:', err); });
+      })();
+    </script>
+  
   </body>
 </html>
