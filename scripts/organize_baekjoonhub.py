@@ -26,6 +26,7 @@ PLATFORM_ALIASES = {
     "programmers": "Programmers", "프로그래머스": "Programmers",
     "leetcode": "LeetCode", "leet code": "LeetCode", "lc": "LeetCode", "리트코드": "LeetCode",
     "hackerrank": "HackerRank", "해커랭크": "HackerRank", "hr": "HackerRank",
+    "datalemur": "DataLemur",
 }
 ALLOW_PLATFORMS = {"BOJ", "SWEA", "Programmers", "LeetCode", "HackerRank"}
 
