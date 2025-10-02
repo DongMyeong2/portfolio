@@ -28,7 +28,8 @@ PLATFORM_ALIASES = {
     "hackerrank": "HackerRank", "해커랭크": "HackerRank", "hr": "HackerRank",
     "datalemur": "DataLemur",
 }
-ALLOW_PLATFORMS = {"BOJ", "SWEA", "Programmers", "LeetCode", "HackerRank"}
+# 허용 플랫폼 집합을 alias의 값들로 자동 구성 (DataLemur 포함)
+ALLOW_PLATFORMS = set(PLATFORM_ALIASES.values())
 
 IGNORE_DIRS = {".git", ".github", "scripts", ".venv", "venv", "__pycache__"}
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -113,10 +114,13 @@ def already_organized_per_problem(rel_parts: list[str]) -> bool:
     """
     if len(rel_parts) < 4:
         return False
-    if rel_parts[0] not in {"Python", "SQL"}:
+    # 최상위 언어 폴더 확인
+    if rel_parts[0] not in ALLOW_TOP_LANG_DIRS:
         return False
+    # 플랫폼 폴더 확인 (DataLemur 등도 포함)
     if rel_parts[1] not in ALLOW_PLATFORMS:
         return False
+    # 문제 폴더가 날짜명이라면 재정리 대상
     if DATE_RE.match(rel_parts[-2]):  # 부모가 날짜이면 재정리 대상
         return False
     return True
@@ -238,10 +242,15 @@ def main():
                 continue  # Python/SQL 이외 스킵
 
             if already_organized_per_problem(rel_parts):
-                continue  # 이미 새 구조
+                # 이미 새 구조
+                continue
 
             # 플랫폼 추정
-            platform = detect_platform([p.lower() for p in parts] + [f.lower()]) or "BOJ"
+            platform = detect_platform([p.lower() for p in parts] + [f.lower()])
+            if platform is None:
+                # 기본값 유지하되 경고 로깅
+                platform = "BOJ"
+                print(f"[warn] 플랫폼 미탐지: {os.path.relpath(src, repo_root)} → 기본값 '{platform}' 적용")
 
             # 문제번호/제목 추출
             parent_hint = parts[-1] if parts else None
@@ -254,6 +263,13 @@ def main():
             folder_name = f"{pid}_{title}" if pid else title
             dst_dir = os.path.join(repo_root, lang, platform, folder_name)
             os.makedirs(dst_dir, exist_ok=True)
+
+            # 목적지 동일 시 이동 스킵 (불필요한 __1 방지)
+            intended_dst_same = os.path.abspath(src) == os.path.abspath(os.path.join(dst_dir, f))
+            if intended_dst_same:
+                # README만 없으면 생성은 시도
+                ensure_readme(dst_dir, platform, pid, title, solved_date, lang, src)
+                continue
 
             # 파일명 충돌 방지
             dst = os.path.join(dst_dir, f)
