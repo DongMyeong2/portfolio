@@ -1,0 +1,18 @@
+WITH base AS (
+    SELECT *
+    FROM FIRST_HALF
+    UNION ALL
+    SELECT * 
+    FROM JULY
+)
+SELECT
+    FLAVOR
+FROM (
+    SELECT
+        FLAVOR,
+        SUM(TOTAL_ORDER) AS TOTAL_ORDER
+    FROM base
+    GROUP BY FLAVOR
+    ORDER BY TOTAL_ORDER DESC
+    LIMIT 3
+) AS a
